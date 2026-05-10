@@ -1,0 +1,181 @@
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background: #f5f6f8;
+}
+
+/* ===== 헤더 ===== */
+.header {
+  padding: 15px;
+  background: white;
+}
+
+/* 상단 버튼 */
+.top {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* 필터 바 */
+.bar {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  overflow-x: auto;
+}
+
+/* 버튼 공통 */
+button {
+  border: 1px solid #ddd;
+  background: white;
+  padding: 8px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+button:hover {
+  background: #111;
+  color: white;
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+/* ===== 카드 리스트 ===== */
+#cardList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+}
+
+/* ===== 앨범 섹션 ===== */
+.album-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.album-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.album-title h2 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.album-title span {
+  color: gray;
+  font-size: 13px;
+}
+
+/* ===== 포카 그리드 ===== */
+.album-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+}
+
+/* 카드 */
+.card {
+  width: 100%;
+  transition: 0.2s ease;
+  opacity: 0.4;
+  filter: grayscale(20%);
+}
+
+.card img {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.card.selected {
+  opacity: 1;
+  filter: none;
+  transform: translateY(-1px);
+}
+
+/* ===== 모달 / 프레임 ===== */
+.modal, .frame {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.box {
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ===== 탭 버튼 ===== */
+.bar button {
+  border: 1px solid #ddd;
+  background: white;
+  padding: 8px 12px;
+  border-radius: 20px;
+}
+
+/* ===== 삭제 모드 바 ===== */
+.delete-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  background: #ff3b30;
+  color: white;
+
+  padding: 10px 14px;
+  font-weight: 600;
+
+  z-index: 9999;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
+}
+
+/* 숨김 */
+.hidden {
+  display: none;
+}
+
+/* ===== 아이패드 / 모바일 ===== */
+@media (max-width: 1024px) {
+  .album-row {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .album-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .top {
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Poca List</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+<div id="deleteBar" class="delete-bar hidden">
+  <span id="deleteCount">0개 선택됨</span>
+</div>
+<header class="header">
+  <h1>Poca List</h1>
+
+  <div class="top">
+    <input id="searchInput" placeholder="검색" />
+    <button id="addBtn">+ 추가</button>
+    <button onclick="openAdmin()">⚙️ 관리</button>
+    <button id="deleteModeBtn" onclick="toggleDeleteMode()">삭제 모드</button>
+<button onclick="deleteSelected()">선택 삭제</button>
+
+<button onclick="exportData()">내보내기</button>
+
+<input type="file" id="importFile" hidden>
+<button onclick="document.getElementById('importFile').click()">
+불러오기
+</button>
+  </div>
+</header>
+
+<!-- 필터 -->
+<div id="groupTabs" class="bar"></div>
+<div id="typeTabs" class="bar"></div>
+
+<!-- 카드 -->
+<main>
+  <div id="cardList"></div>
+</main>
+
+<!-- 모달 -->
+<div id="modal" class="modal hidden">
+  <div class="box">
+
+    <input id="nameInput" placeholder="이름" />
+
+    <select id="artistInput"></select>
+    <input id="albumNameInput" placeholder="앨범" />
+    <select id="memberInput"></select>
+
+    <select id="sourceInput">
+      <option>앨범</option>
+      <option>특전</option>
+      <option>럭드</option>
+      <option>팬키트</option>
+      <option>시즌그리팅</option>
+      <option>MD</option>
+    </select>
+
+    <input id="detailInput" placeholder="앨범명 / 특전명 / 럭드명 등등">
+    <input type="file" id="fileInput" />
+
+    <button id="saveBtn">저장</button>
+    <button onclick="closeModal()">닫기</button>
+
+  </div>
+</div>
+
+<!-- 관리 -->
+<div id="adminPanel" class="modal hidden">
+  <div class="box">
+
+    <h3>관리</h3>
+
+    <!-- 그룹 추가 -->
+    <h4>그룹 추가</h4>
+    <input id="newGroupInput" placeholder="그룹 이름">
+    <button onclick="addGroupUI()">추가</button>
+
+    <hr>
+
+    <!-- 앨범 추가 -->
+    <h4>앨범 추가</h4>
+    <select id="groupSelect"></select>
+    <input id="newAlbumInput" placeholder="앨범 이름">
+    <button onclick="addAlbumUI()">추가</button>
+
+    <hr>
+
+    <!-- 멤버 추가 -->
+    <h4>멤버 추가</h4>
+    <select id="groupSelect2"></select>
+    <select id="albumSelect2"></select>
+    <input id="newMemberInput" placeholder="멤버 이름">
+    <button onclick="addMemberUI()">추가</button>
+
+    <br><br>
+    <button onclick="closeAdmin()">닫기</button>
+
+  </div>
+</div>
+
+<!-- 프레임 -->
+<div id="frame" class="frame hidden">
+  <img id="frameImg" />
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
