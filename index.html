@@ -23,7 +23,12 @@
 
 <button onclick="exportData()">내보내기</button>
 
-<input type="file" id="importFile" hidden>
+<input
+  type="file"
+  id="importFile"
+  accept=".txt,.json"
+  hidden
+>
 <button onclick="document.getElementById('importFile').click()">
 불러오기
 </button>
@@ -72,7 +77,15 @@
   <div class="box">
 
     <h3>관리</h3>
+<hr>
 
+<h4>백업</h4>
+
+<button onclick="exportData()">
+백업 다운로드
+</button>
+
+<input type="file" id="importFile">
     <!-- 그룹 추가 -->
     <h4>그룹 추가</h4>
     <input id="newGroupInput" placeholder="그룹 이름">
@@ -107,5 +120,6 @@
 </div>
 
 <script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 </body>
 </html>

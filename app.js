@@ -40,49 +40,38 @@ function saveMaster() {
 }
 // ===== 저장 =====
 function save() {
-  localStorage.setItem("items", JSON.stringify(items));
+
+  try {
+
+    localStorage.setItem(
+      "items",
+      JSON.stringify(items)
+    );
+
+  } catch(err) {
+
+    alert(
+      "저장 공간이 부족해!\n\n" +
+      "포카 이미지를 줄이거나\n" +
+      "백업 후 일부 삭제해야 해."
+    );
+
+    console.error(err);
+
+  }
+
 }
 
 // ===== 이미지 =====
 fileInput.onchange = e => {
 
   const file = e.target.files[0];
+
   if (!file) return;
 
-  const reader = new FileReader();
+  // ⭐ 파일 이름만 저장
+  fileBase64 = "images/" + file.name;
 
-  reader.onload = event => {
-
-    const img = new Image();
-
-    img.onload = () => {
-
-      const canvas = document.createElement("canvas");
-
-      // ⭐ 크기 줄이기
-      const maxWidth = 300;
-
-      const scale = maxWidth / img.width;
-
-      canvas.width = maxWidth;
-      canvas.height = img.height * scale;
-
-      const ctx = canvas.getContext("2d");
-
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-      // ⭐ 압축
-      fileBase64 = canvas.toDataURL(
-        "image/jpeg",
-        0.7
-      );
-
-    };
-
-    img.src = event.target.result;
-  };
-
-  reader.readAsDataURL(file);
 };
 
 // ===== 모달 =====
@@ -91,7 +80,23 @@ function closeModal(){ modal.classList.add("hidden"); }
 
 // ===== 저장 =====
 saveBtn.onclick = () => {
-  items.unshift({
+  const exists = items.some(i =>
+
+  i.artist === artistInput.value &&
+  i.album === albumNameInput.value &&
+  i.member === memberInput.value &&
+  i.detail === detailInput.value
+
+);
+
+if(exists){
+
+  alert("이미 있는 포카야!");
+
+  return;
+
+}
+    items.unshift({
   name: nameInput.value,
   artist: artistInput.value,
   album: albumNameInput.value || "기타",
@@ -114,7 +119,9 @@ function render(){
   let filtered = items.filter(i =>
     (currentGroup === "all" || i.artist === currentGroup) &&
     (currentType === "all" || i.type === currentType) &&
-    (i.name + i.artist + i.member).toLowerCase().includes(searchInput.value.toLowerCase())
+    (i.name + i.artist + i.member)
+    .toLowerCase()
+    .includes(searchInput.value.toLowerCase())
   );
 
   // 앨범별 묶기
@@ -135,6 +142,10 @@ Object.keys(grouped).forEach(albumName => {
   section.className = "album-section";
 
   const owned = grouped[albumName].filter(i => i.selected).length;
+  const percent =
+  total > 0
+  ? Math.round((owned / total) * 100)
+  : 0;
 const total = grouped[albumName].length;
 
 const isComplete = owned === total && total > 0;
@@ -147,15 +158,51 @@ const isComplete = owned === total && total > 0;
       ${isComplete ? "🔥 100%" : ""}
     </span>
   </div>
-
+<div class="progress-wrap">
+  <div
+    class="progress-bar"
+    style="width:${percent}%"
+  ></div>
+</div>
   <div class="album-row"></div>
 `;
 
   const row = section.querySelector(".album-row");
+new Sortable(row, {
 
+  animation: 150,
+
+  ghostClass: "dragging",
+
+  onEnd: () => {
+
+    const newOrder = [];
+
+    document
+      .querySelectorAll(".card")
+      .forEach(card => {
+
+        const index =
+          card.dataset.index;
+
+        newOrder.push(
+          filtered[index]
+        );
+
+      });
+
+    items = newOrder;
+
+    save();
+
+  }
+
+});
   grouped[albumName].forEach(i => {
 
     const c = document.createElement("div");
+    c.dataset.index =
+  items.indexOf(i);
     c.className = "card";
 
     if(i.selected){
@@ -203,7 +250,7 @@ function renderTabs(){
   const t = document.getElementById("typeTabs");
   t.innerHTML = "";
 
-  ["all","앨범","특전","럭드","팬키트","시즌그리팅","미공포"].forEach(x=>{
+  ["all","앨범","특전","럭드","팬키트","시즌그리팅","MD"].forEach(x=>{
     const b = document.createElement("button");
     b.textContent = x === "all" ? "전체" : x;
     b.onclick = ()=>{ currentType = x; render(); };
@@ -266,7 +313,7 @@ function renderTypeTabs(){
 
   t.innerHTML = "";
 
-  const types = ["all","앨범","특전","럭드","팬키트","시즌그리팅","미공포"];
+  const types = ["all","앨범","특전","럭드","팬키트","시즌그리팅","MD"];
 
   types.forEach(x=>{
     const b = document.createElement("button");
@@ -419,46 +466,86 @@ document.getElementById("groupSelect2").onchange = updateAlbumSelect;
 // ===== 데이터 내보내기 =====
 function exportData() {
 
-  const data = {
-    items,
-    masterData
-  };
+  try {
 
-  const json = JSON.stringify(data);
+    const backup = {
+      version: 1,
+      items: items || [],
+      masterData: masterData || {}
+    };
 
-  const blob = new Blob([json], {
-    type: "application/json"
-  });
+    const text = JSON.stringify(backup);
 
-  const url = URL.createObjectURL(blob);
+    const blob = new Blob(
+      [text],
+      { type: "application/json" }
+    );
 
-  const a = document.createElement("a");
-  a.href = url;
+    const url = URL.createObjectURL(blob);
 
-  a.download = "pocalist-data.json";
+    const a = document.createElement("a");
 
-  a.click();
+    a.href = url;
+    a.download = "pocalist-backup.json";
 
-  URL.revokeObjectURL(url);
+    document.body.appendChild(a);
+
+    a.click();
+
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
+
+    alert("백업 완료!");
+
+  } catch(err) {
+
+    console.error(err);
+    alert("백업 실패");
+
+  }
+
 }
 // ===== 데이터 불러오기 =====
-document.getElementById("importFile")
-.addEventListener("change", e => {
+document
+.getElementById("importFile")
+.addEventListener("change", function(e){
 
   const file = e.target.files[0];
 
-  if (!file) return;
+  if(!file){
+    alert("파일 없음");
+    return;
+  }
 
   const reader = new FileReader();
 
-  reader.onload = event => {
+  reader.onload = function(event){
 
     try {
 
-      const data = JSON.parse(event.target.result);
+      const text = event.target.result;
 
-      items = data.items || [];
-      masterData = data.masterData || {};
+      if(!text){
+        alert("빈 파일");
+        return;
+      }
+
+      const data = JSON.parse(text);
+
+      if(typeof data !== "object"){
+        alert("잘못된 데이터");
+        return;
+      }
+
+      items = Array.isArray(data.items)
+        ? data.items
+        : [];
+
+      masterData =
+        typeof data.masterData === "object"
+        ? data.masterData
+        : {};
 
       save();
       saveMaster();
@@ -467,15 +554,26 @@ document.getElementById("importFile")
 
       alert("불러오기 완료!");
 
-    } catch {
-      alert("파일 오류");
+    } catch(err){
+
+      console.error(err);
+
+      alert(
+        "파일 오류\n\n" +
+        err.message
+      );
+
     }
 
   };
-
+if(file.size > 15000000){
+  alert("파일이 너무 커!");
+  return;
+}
   reader.readAsText(file);
 
 });
+
 // ===== 초기 =====
 render();
 renderGroupOptions(); // ⭐ 이거 추가ender();
